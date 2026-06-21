@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Tia Saputri • Bidadari Penembak Hati</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&family=Playfair+Display:ital@0;1&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Annie+Use+Your+Telescope&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ========== OPTIMASI CSS UNTUK PERFORMANCE ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #faf3ec 0%, #f0e7df 100%);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Canvas kelopak bunga */
+        #petalCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            will-change: transform;
+        }
+        .main-wrapper {
+            position: relative;
+            z-index: 10;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem 1.2rem 2rem;
+        }
+        .romance-header { text-align: center; margin-bottom: 1.5rem; }
+        .name-glow { font-family: 'Great Vibes', cursive; font-size: 3.6rem; color: #5e3a2a; text-shadow: 2px 2px 12px rgba(160,100,70,0.15); }
+        .subtitle { font-family: 'Playfair Display', serif; background: rgba(255,245,235,0.7); display: inline-block; padding: 0.3rem 1.4rem; border-radius: 40px; font-size: 0.85rem; color: #b0795c; backdrop-filter: blur(4px); }
+        .game-panel { display: flex; flex-wrap: wrap; gap: 1.8rem; justify-content: center; margin-bottom: 1.5rem; }
+        .game-area-card { flex: 3; min-width: 300px; background: rgba(255,250,245,0.75); backdrop-filter: blur(8px); border-radius: 48px; padding: 1rem; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); border: 1px solid rgba(220,190,165,0.6); }
+        .info-card { flex: 1.2; min-width: 240px; background: rgba(255,248,240,0.8); backdrop-filter: blur(8px); border-radius: 42px; padding: 1.4rem 1.2rem; border: 1px solid #eedbcb; }
+        #gameCanvas { display: block; width: 100%; background: rgba(245,230,218,0.4); border-radius: 36px; cursor: crosshair; box-shadow: 0 6px 14px rgba(0,0,0,0.05); border: 1px solid #e7d2c2; will-change: transform; }
+        .score-box { background: #fff3ea; border-radius: 50px; padding: 0.5rem 1rem; text-align: center; margin: 0.7rem 0; }
+        .score-box span { font-size: 2.2rem; font-weight: 800; color: #c27e5c; margin-right: 0.3rem; }
+        .message-area { background: #f7ede5; border-radius: 28px; padding: 0.8rem; font-size: 0.85rem; color: #8a624b; text-align: center; margin: 1rem 0; border-left: 5px solid #e2bc9f; min-height: 80px; }
+        /* Music player lebih ringan */
+        .music-custom { background: linear-gradient(135deg,#f4e5da,#ecd9ca); border-radius: 50px; padding: 0.8rem 1rem; margin-top: 1rem; box-shadow: 0 8px 18px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6); border: 1px solid #e6cfbe; }
+        .music-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; justify-content: space-between; }
+        .music-badge { background: #c28f72; border-radius: 30px; padding: 4px 10px; font-size: 0.65rem; font-weight: 600; color: white; display: inline-flex; align-items: center; gap: 5px; }
+        .dancing-bear { font-size: 1.8rem; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); display: inline-block; transition: all 0.1s; }
+        .dancing-bear.dance { animation: bearShake 0.4s infinite alternate ease-in-out; will-change: transform; }
+        @keyframes bearShake { 0%{transform:rotate(0deg) translateY(0px);}100%{transform:rotate(5deg) translateY(-3px);} }
+        .player-core { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px 0 4px; }
+        .play-btn-modern { background: #e2c7b6; width: 48px; height: 48px; border-radius: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #774f38; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: none; }
+        .visualizer { flex: 1; display: flex; align-items: center; gap: 5px; height: 40px; background: rgba(100,60,40,0.1); border-radius: 60px; padding: 0 12px; backdrop-filter: blur(2px); }
+        .viz-bar { width: 6px; background: #b77b5a; border-radius: 6px; transition: height 0.1s ease; height: 12px; }
+        .marquee-wrapper { background: #fffaf5; border-radius: 40px; padding: 5px 12px; overflow: hidden; white-space: nowrap; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); margin-top: 10px; border: 1px solid #e9d6ca; }
+        .song-marquee { display: inline-block; padding-left: 100%; animation: smoothMarquee 14s linear infinite; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.8rem; color: #aa765b; }
+        @keyframes smoothMarquee { 0%{transform:translateX(0%);}100%{transform:translateX(-100%);} }
+        .reset-game { background: #eadacf; border: none; border-radius: 30px; padding: 0.5rem 1.2rem; font-size: 0.75rem; margin-top: 12px; cursor: pointer; color: #5c3f30; font-weight: 500; width: 100%; }
+        .footer { text-align: center; font-size: 0.7rem; margin-top: 2rem; color: #b48d74; border-top: 1px solid #e6d4c6; padding-top: 1rem; }
+        .instruction { font-size: 0.7rem; text-align: center; margin-top: 8px; color: #bd927a; }
+        @media (max-width:780px){ .name-glow{font-size:2.4rem;} .player-core{flex-wrap:wrap;justify-content:center;} .visualizer{width:100%;justify-content:center;} }
+        button { cursor: pointer; }
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(250,243,236,0.96);
+            backdrop-filter: blur(10px);
+            z-index:2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap:1.5rem;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .loading-overlay.hide { opacity:0; visibility:hidden; }
+        .loader-bear { font-size:5rem; animation: bearWobble 1s infinite ease-in-out; will-change: transform; }
+        @keyframes bearWobble { 0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-12px) rotate(5deg);} }
+        .loading-text { font-family:'Inter',sans-serif; font-size:1.6rem; font-weight:600; color:#9b6b53; background:rgba(255,248,240,0.6); padding:0.5rem 1.5rem; border-radius:60px; }
+        .loading-progress { width:260px; height:6px; background:#eedbcb; border-radius:10px; overflow:hidden; }
+        .loading-progress-bar { width:0%; height:100%; background:#e0a382; transition:width 0.2s ease; }
+        .loading-sub { font-size:0.85rem; color:#c49a7c; margin-top:0.5rem; background:rgba(255,245,235,0.5); padding:0.2rem 1rem; border-radius:50px; }
+        /* Modal biasa */
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background-color:rgba(0,0,0,0.5);
+            backdrop-filter:blur(5px);
+            z-index:1000;
+            display: flex; justify-content: center; align-items: center;
+            visibility: hidden; opacity:0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+        .modal-overlay.active { visibility: visible; opacity:1; }
+        .modal-card {
+            background:rgba(255,248,242,0.96);
+            backdrop-filter:blur(12px);
+            max-width:450px; width:90%; max-height:85vh;
+            border-radius:48px; padding:1.5rem;
+            text-align:center;
+            box-shadow:0 30px 40px -15px rgba(0,0,0,0.2);
+            border:1px solid #f0dbce;
+            animation:fadeScale 0.25s ease-out;
+            display:flex; flex-direction:column; overflow:hidden;
+        }
+        @keyframes fadeScale { from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
+        .modal-message {
+            font-family:"Annie Use Your Telescope", cursive;
+            font-size:1rem; line-height:1.5;
+            color:#5c3f30;
+            background:#fff5ef;
+            padding:1rem;
+            border-radius:32px;
+            flex:1; overflow-y:auto; max-height:55vh;
+            white-space:pre-wrap; word-break:break-word;
+            scrollbar-width:thin;
+        }
+        .modal-message::-webkit-scrollbar { width:5px; }
+        .modal-message::-webkit-scrollbar-track { background:#f0e0d4; border-radius:10px; }
+        .modal-message::-webkit-scrollbar-thumb { background:#dbbcac; border-radius:10px; }
+        .modal-btn { background:#ebd5c8; border:none; padding:0.5rem 1.5rem; border-radius:50px; font-size:0.9rem; font-weight:600; color:#6d4230; cursor:pointer; align-self:center; margin-top:0.2rem; }
+        /* Final modal */
+        .final-modal {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background-color:rgba(0,0,0,0.6);
+            backdrop-filter:blur(6px);
+            z-index:1100;
+            display: flex; justify-content: center; align-items: center;
+            visibility: hidden; opacity:0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+        .final-modal.active { visibility: visible; opacity:1; }
+        .final-card {
+            background:rgba(255,248,242,0.98);
+            backdrop-filter:blur(12px);
+            max-width:500px; width:90%; max-height:85vh;
+            border-radius:48px; padding:1.8rem;
+            text-align:center;
+            box-shadow:0 30px 40px -15px rgba(0,0,0,0.3);
+            border:1px solid #f0dbce;
+            animation:fadeScale 0.3s ease-out;
+            display:flex; flex-direction:column;
+        }
+        .final-message {
+            font-size:0.95rem; line-height:1.6;
+            color:#5c3f30; background:#fff5ef;
+            padding:1.2rem; border-radius:32px;
+            text-align:left; white-space:pre-wrap;
+            max-height:55vh; overflow-y:auto;
+        }
+        .important-note { margin-top:1rem; padding-top:0.5rem; border-top:1px dashed #e2bc9f; color:#8a8a8a; font-style:italic; font-size:0.85rem; text-align:center; }
+        .final-buttons { display:flex; justify-content:space-between; gap:1rem; margin-top:0.5rem; }
+        .final-btn { flex:1; background:#ebd5c8; border:none; padding:0.7rem; border-radius:50px; font-size:1rem; font-weight:600; color:#6d4230; cursor:pointer; }
+        .final-btn.right { background:#e2bc9f; color:#4a2e22; }
+        .heart-rain-overlay { position:fixed; top:0; left:0; width:100%; height:100%; z-index:1050; pointer-events:none; overflow:hidden; }
+        .heart-particle { position:absolute; font-size:1.8rem; animation:floatHeartRain 1.5s ease-out forwards; color:#e8a07e; will-change: transform; }
+        @keyframes floatHeartRain { 0%{transform:translateY(0) scale(0.5); opacity:1;} 100%{transform:translateY(-150px) scale(1.2); opacity:0;} }
+        .floating-text-long {
+            position: fixed; top:45%; left:50%; transform:translate(-50%,-50%);
+            font-family:'Great Vibes', cursive; font-size:2rem; color:#b85c32;
+            background:rgba(255,248,240,0.95); padding:1rem 2rem; border-radius:70px;
+            backdrop-filter:blur(12px); white-space:nowrap;
+            z-index:1060; box-shadow:0 15px 35px rgba(0,0,0,0.2);
+            animation:cuteFloatExit 5s ease-in-out forwards; pointer-events:none;
+        }
+        @keyframes cuteFloatExit { 0%{opacity:0; transform:translate(-50%,-50%) scale(0.7);} 10%{opacity:1; transform:translate(-50%,-50%) scale(1.05);} 80%{opacity:1;} 100%{opacity:0; visibility:hidden;} }
+        @keyframes floatHeartUp { 0%{transform:translateY(0) scale(0.6); opacity:0.8;} 100%{transform:translateY(-60px) scale(1.2); opacity:0;} }
+    </style>
+</head>
+<body>
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loader-bear">🧸🐻</div>
+    <div class="loading-text">Memuat Game...</div>
+    <div class="loading-progress"><div class="loading-progress-bar" id="loadingBar"></div></div>
+    <div class="loading-sub">✨ Menyiapkan panah & hati ✨</div>
+</div>
+<canvas id="petalCanvas"></canvas>
+<div class="main-wrapper">
+    <div class="romance-header">
+        <h1 class="name-glow">Tia Saputri</h1>
+        <div class="subtitle"><i class="fas fa-feather-alt"></i>  Orang Cantik Yang Sudah Hadir Di Kehidupan Febri  <i class="fas fa-heart"></i></div>
+    </div>
+    <div class="game-panel">
+        <div class="game-area-card">
+            <canvas id="gameCanvas" width="900" height="450" style="width:100%; height:auto; max-width:900px; aspect-ratio:900/450"></canvas>
+            <div class="instruction">
+                <i class="fas fa-mouse-pointer"></i> Klik / tap di area canvas → tembakkan panah ke hati yang bergerak! <i class="fas fa-heart-broken"></i>
+                <span style="display:block; font-size:0.65rem;">⏱️ Cooldown 1 dtk • Skor tinggi = hati makin cepat!</span>
+            </div>
+        </div>
+        <div class="info-card">
+            <div class="score-box"><i class="fas fa-arrow-right"></i> Skor Tiaa <i class="fas fa-arrow-left"></i><br><span id="loveScore">0</span> <i class="fas fa-heart"></i></div>
+            <div id="romanticMessage" class="message-area">💘 Tembak hati yang lewat! Raih skor 20,50,80,100,130 untuk pesan spesial, skor 150 untuk kejutan 💘</div>
+            <div class="music-custom">
+                <div class="music-header"><div class="music-badge"><i class="fas fa-cassette-tape"></i> Kaset Armada</div><div class="dancing-bear" id="dancingBear">🧸🎶</div></div>
+                <div class="player-core">
+                    <button id="playPauseMusicBtn" class="play-btn-modern"><i class="fas fa-play"></i></button>
+                    <div class="visualizer" id="visualizerContainer">
+                        <div class="viz-bar" style="height:12px;"></div><div class="viz-bar" style="height:20px;"></div><div class="viz-bar" style="height:8px;"></div><div class="viz-bar" style="height:18px;"></div><div class="viz-bar" style="height:14px;"></div>
+                    </div>
+                </div>
+                <div class="marquee-wrapper"><div class="song-marquee">🎵 ♫  Armada - Mau Dibawa Kemana  ♫ 🎵  ❤️ spesial untuk Tia ❤️</div></div>
+                <div class="music-note-icon" style="text-align:right; font-size:0.6rem; margin-top:4px;"><i class="fas fa-headphones"></i> Putar lagunya Cantikk</div>
+            </div>
+            <button id="resetGameBtn" class="reset-game"><i class="fas fa-sync-alt"></i> Tebarkan Hati Baru</button>
+            <div class="instruction" style="margin-top:12px;">🌸 setiap panah tepat sasaran → +1 cinta. Skor 150 → kejutan + lagu otomatis berhenti 🌸</div>
+        </div>
+    </div>
+    <div class="footer"><i class="fas fa-crown"></i> created by Febri • untuk Tia Saputri <i class="fas fa-heart" style="color:#e6b79e;"></i></div>
+</div>
+
+<div id="achievementModal" class="modal-overlay"><div class="modal-card"><i class="fas fa-heart"></i><h3> untuk Tia 💗</h3><div id="modalMessage" class="modal-message"></div><button id="closeModalBtn" class="modal-btn">Iya Febri</button></div></div>
+<div id="finalModal" class="final-modal"><div class="final-card"><i class="fas fa-heart" style="font-size:2rem;"></i><h3 style="font-family:'Great Vibes';">Pesan Terakhir</h3><div id="finalMessage" class="final-message"></div><div class="final-buttons"><button id="finalLeftBtn" class="final-btn left">Just friend 😔</button><button id="finalRightBtn" class="final-btn right">Terima 🥰</button></div></div></div>
+
+<script>
+    (function(){
+        // ==================== PRELOAD EFEK SUARA ====================
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingBar = document.getElementById('loadingBar');
+        const audioUrlsEffect = [
+            'https://www.image2url.com/r2/default/audio/1780212670348-5b897a11-0f0b-4b84-859a-8174e5417a5e.mp3',
+            'https://www.image2url.com/r2/default/audio/1780212375292-211e035b-549d-4c48-9f52-4c6a652f10c4.mp3',
+            'https://www.image2url.com/r2/default/audio/1780317780080-5f6f5ea6-1397-4285-aa40-bf9ea273f405.mp3',
+            'https://www.image2url.com/r2/default/audio/1780317895206-e7e2a2be-3106-409e-8c87-4bd3ffbde1f7.mp3'
+        ];
+        let loadedCount=0;
+        let shootAudio, hitAudio, berhasilAudio, popAudio;
+        function updateProgress(){ 
+            loadingBar.style.width = (loadedCount/audioUrlsEffect.length)*100+'%'; 
+            if(loadedCount===audioUrlsEffect.length){ 
+                loadingOverlay.classList.add('hide'); 
+                setTimeout(()=>loadingOverlay.style.display='none',500); 
+                startGame(); 
+            } 
+        }
+        function preloadAudio(url){ 
+            return new Promise(r=>{ 
+                let a=new Audio(); 
+                a.src=url; 
+                a.load(); 
+                a.oncanplaythrough=()=>{ loadedCount++; updateProgress(); r(a); }; 
+                a.onerror=()=>{ loadedCount++; updateProgress(); r(null); }; 
+                setTimeout(()=>{ 
+                    if(loadedCount<=audioUrlsEffect.indexOf(url)){ loadedCount++; updateProgress(); r(null); } 
+                },4000); 
+            }); 
+        }
+        Promise.all(audioUrlsEffect.map(u=>preloadAudio(u))).then(arr=>{ shootAudio=arr[0]; hitAudio=arr[1]; berhasilAudio=arr[2]; popAudio=arr[3]; });
+
+        // ==================== MUSIK BACKGROUND ====================
+        const BG_URL = 'https://www.image2url.com/r2/default/audio/1781201299352-02279a27-af72-4c63-83f2-134c559c75c9.mp3';
+        let bgMusic=null, isMusicPlaying=false, vizInterval=null;
+        const playBtn=document.getElementById('playPauseMusicBtn'), dancingBear=document.getElementById('dancingBear'), vizBars=document.querySelectorAll('.viz-bar');
+        function startViz(){ 
+            if(vizInterval) clearInterval(vizInterval); 
+            vizInterval=setInterval(()=>{ 
+                if(isMusicPlaying && bgMusic && !bgMusic.paused){ 
+                    vizBars.forEach(bar=>bar.style.height=Math.floor(Math.random()*22)+8+'px'); 
+                } else { 
+                    vizBars.forEach(bar=>bar.style.height='10px'); 
+                } 
+            },200); 
+        }
+        function initMusic(){ 
+            if(!bgMusic){ 
+                bgMusic=new Audio(BG_URL); 
+                bgMusic.loop=true; 
+                bgMusic.volume=0.4; 
+                bgMusic.onplay=()=>{ isMusicPlaying=true; playBtn.innerHTML='<i class="fas fa-pause"></i>'; dancingBear.classList.add('dance'); startViz(); }; 
+                bgMusic.onpause=()=>{ isMusicPlaying=false; playBtn.innerHTML='<i class="fas fa-play"></i>'; dancingBear.classList.remove('dance'); vizBars.forEach(bar=>bar.style.height='10px'); }; 
+                bgMusic.load();
+            } 
+        }
+        function stopBgMusic(){ 
+            if(bgMusic){ bgMusic.pause(); bgMusic.currentTime=0; isMusicPlaying=false; playBtn.innerHTML='<i class="fas fa-play"></i>'; dancingBear.classList.remove('dance'); if(vizInterval) clearInterval(vizInterval); vizBars.forEach(bar=>bar.style.height='10px'); } 
+        }
+        playBtn.addEventListener('click',()=>{ if(!bgMusic) initMusic(); if(bgMusic.paused) bgMusic.play().catch(e=>{}); else bgMusic.pause(); });
+
+        // ==================== GAME CORE ====================
+        const canvas=document.getElementById('gameCanvas'), ctx=canvas.getContext('2d');
+        let cw=900, ch=450; canvas.width=cw; canvas.height=ch;
+        const fairy={x:70, y:ch/2};
+        let hearts=[], arrows=[], loveScore=0, gameActive=false, lastShoot=0, lastSpawn=0;
+        const scoreSpan=document.getElementById('loveScore'), msgDiv=document.getElementById('romanticMessage');
+        function playShoot(){ shootAudio&&(shootAudio.currentTime=0, shootAudio.play().catch(()=>{})); }
+        function playHit(){ hitAudio&&(hitAudio.currentTime=0, hitAudio.play().catch(()=>{})); }
+        function playBerhasil(){ berhasilAudio&&(berhasilAudio.currentTime=0, berhasilAudio.play().catch(()=>{})); }
+        function playPop(){ popAudio&&(popAudio.currentTime=0, popAudio.play().catch(()=>{})); }
+        function rand(min,max){ return min+Math.random()*(max-min); }
+        function getHeartSpeed(){ let p=Math.min(loveScore,150)/150; return rand(1.2+p*2, 2.2+p*2); }
+        const achievementMsgs={
+            20:"Laut selalu terlihat tenang dari kejauhan. \n\nPadahal di bawah permukaannya ada dunia yang jauh lebih luas daripada yang bisa dilihat mata. \n\nEntah kenapa, kesan yang aku dapat tentang kamu seperti itu. \n\nSemakin aku mendengar cerita tentangmu, semakin terasa bahwa apa yang terlihat hanyalah sebagian kecil dari dirimu. \n\nDan mungkin itulah yang membuatku penasaran.",
+            50:"Aku pernah membaca tentang cahaya bintang. \n\nKatanya, cahaya yang kita lihat malam ini bisa jadi berasal dari masa lalu yang sangat jauh. \n\nAneh ya. \n\nKarena aku merasa perasaanku padamu juga seperti itu. \n\nAku bahkan belum benar - benar mengenalmu.\n\nTapi sesuatu tentang dirimu sudah lebih dulu sampai kepadaku, jauh sebelum aku berani mendekat.",
+            80:"Ada sebuah teori sederhana. \n\nSemakin jauh suatu benda di alam semesta, semakin lama waktu yang dibutuhkan cahayanya untuk sampai kepada kita. \n\nMungkin itu sebabnya aku tidak pernah terburu - buru. \n\nKarena beberapa hal yang indah memang tidak ditakdirkan untuk datang dengan cepat. \n\nDan jika suatu hari aku berhasil mengenalmu lebih jauh, aku ingin itu terjadi bukan karena kebetulan. \n\nMelainkan karena aku cukup sabar menunggu jarak itu perlahan menghilang.",
+            100:"Aku sering berpikir bahwa orang - orang seperti kamu dan aku berasal dari musim yang berbeda. \n\nKamu seperti musim semi yang membawa banyak hal baik ke sekitarmu. \n\nSedangkan aku masih seperti akhir musim hujan yang belum selesai membereskan awannya sendiri. \n\nTapi mungkin alasan aku terus memandang ke arahmu bukan karena ingin memilikimu. \n\nMelainkan karena keberadaanmu mengingatkanku bahwa setelah hujan yang panjang, selalu ada musim yang lebih hangat untuk dituju.",
+            130:"Untuk tia\n\n Entah sampai kapan eps tentang kita berdua, \n\nBerakhir dengan heppy end atau sad end Fberi juga tidak tahu \n\nyang terpenting sekarang adalah febri sudah berusaha. \n\nBerat.. Tapi febri tahu usaha yang besar memang untuk hasil yang indah \n\nKalau hasil nya berakhir tidak enak \n\nTidak perlu di khawatirkan sebab cinta memang tak bersyarat \n\nLayak nya pejuang sparta di medan tempur begitulah kehidupan febri \n\nsejak dulu sudah terbiasa kalau mau hasil yang indah ,usaha nya juga tidak sedikit. \n\nGame ini jadi bukti Usaha besar febri untuk tia \n\nFebri harap perjuangan ini akan jadi alasan mengapa seoarang pria biasa ini menyukai wanita yang sangat indah... karena tia memang indahh \n\nTERIMAKASIH SUDAH MAU MEMABACA NYAA TIA😇 "
+        };
+        const modalAchieve=document.getElementById('achievementModal'), modalMsg=document.getElementById('modalMessage'), closeModal=document.getElementById('closeModalBtn');
+        function showAchievePopup(s){ if(s===150)return; let m=achievementMsgs[s]; if(m){ modalMsg.innerHTML=m; modalAchieve.classList.add('active'); playBerhasil(); } }
+        closeModal.addEventListener('click',()=>{ modalAchieve.classList.remove('active'); playPop(); });
+        function resetGame(){
+            loveScore=0; scoreSpan.innerText=loveScore; msgDiv.innerHTML="🌸 Hati baru tersebar! Arahkan panah cintamu lagi untuk Tia 🌸";
+            if(modalAchieve.classList.contains('active')) modalAchieve.classList.remove('active');
+            gameActive=true;
+        }
+        function addScore(inc){
+            if(!gameActive||loveScore>=150)return;
+            let ns=loveScore+inc; if(ns>150)ns=150;
+            loveScore=ns; scoreSpan.innerText=loveScore;
+            if([20,50,80,100,130].includes(loveScore)) showAchievePopup(loveScore);
+            if(loveScore===150) triggerFinal();
+            createFloatHeart();
+        }
+        function createFloatHeart(){
+            let e=document.createElement('i'); e.className='fas fa-heart'; e.style.position='fixed';
+            e.style.left=Math.random()*innerWidth+'px'; e.style.top=Math.random()*innerHeight*0.6+30+'px';
+            e.style.color=`rgba(230,140,100,${Math.random()*0.6+0.3})`; e.style.fontSize=Math.random()*20+12+'px';
+            e.style.pointerEvents='none'; e.style.zIndex='99'; e.style.animation='floatHeartUp 0.8s forwards';
+            document.body.appendChild(e); setTimeout(()=>e.remove(),800);
+        }
+        class Heart{
+            constructor(y,speed){ this.x=cw+15; this.y=y; this.r=18; this.speed=speed; this.active=true; }
+            update(){ this.x-=this.speed; if(this.x+this.r<0) this.active=false; }
+            draw(ctx){
+                ctx.save(); ctx.shadowBlur=6; let x=this.x,y=this.y,r=this.r;
+                ctx.beginPath(); ctx.moveTo(x,y); ctx.bezierCurveTo(x-r/1.6,y-r/1.3,x-r*1.2,y+r/2.5,x,y+r*0.9);
+                ctx.bezierCurveTo(x+r*1.2,y+r/2.5,x+r/1.6,y-r/1.3,x,y); ctx.fillStyle="#e09d82"; ctx.fill();
+                ctx.fillStyle="#bc7a5c"; ctx.beginPath(); ctx.arc(x-r*0.3,y-r*0.2,r*0.2,0,Math.PI*2); ctx.arc(x+r*0.3,y-r*0.2,r*0.2,0,Math.PI*2); ctx.fill();
+                ctx.restore();
+            }
+        }
+        class Arrow{
+            constructor(fx,fy,tx,ty){
+                this.x=fx; this.y=fy; let dx=tx-fx, dy=ty-fy, len=Math.hypot(dx,dy);
+                if(len===0){ this.vx=0; this.vy=0; }else{ this.vx=(dx/len)*7.5; this.vy=(dy/len)*7.5; }
+                this.r=6; this.active=true; this.ang=Math.atan2(dy,dx);
+            }
+            update(){ this.x+=this.vx; this.y+=this.vy; if(this.x<-30||this.x>cw+50||this.y<-30||this.y>ch+50) this.active=false; }
+            draw(ctx){
+                ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.ang);
+                ctx.beginPath(); ctx.moveTo(12,0); ctx.lineTo(0,-3); ctx.lineTo(0,3); ctx.fillStyle="#bd8d70"; ctx.fill();
+                ctx.beginPath(); ctx.moveTo(12,0); ctx.lineTo(18,-2); ctx.lineTo(18,2); ctx.fillStyle="#a56f53"; ctx.fill();
+                ctx.restore();
+            }
+        }
+        function collision(){
+            if(!gameActive)return;
+            for(let i=0;i<arrows.length;i++){
+                let a=arrows[i]; if(!a.active)continue;
+                for(let j=0;j<hearts.length;j++){
+                    let h=hearts[j]; if(!h.active)continue;
+                    if(Math.hypot(a.x-h.x,a.y-h.y)<h.r+a.r){
+                        a.active=false; h.active=false; addScore(1); playHit(); hitEffect(h.x,h.y); break;
+                    }
+                }
+            }
+            arrows=arrows.filter(a=>a.active); hearts=hearts.filter(h=>h.active);
+        }
+        function hitEffect(x,y){
+            for(let i=0;i<6;i++){
+                let p=document.createElement('div'); p.innerHTML='❤️'; p.style.position='fixed';
+                p.style.left=(canvas.getBoundingClientRect().left+x)+'px';
+                p.style.top=(canvas.getBoundingClientRect().top+y)+'px';
+                p.style.fontSize='14px'; p.style.pointerEvents='none'; p.style.animation='floatHeartUp 0.5s forwards';
+                document.body.appendChild(p); setTimeout(()=>p.remove(),500);
+            }
+        }
+        function shootArrow(mx,my){
+            if(!gameActive)return; let now=Date.now(); if(now-lastShoot<1000)return; lastShoot=now;
+            let rect=canvas.getBoundingClientRect(), sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+            let cx=(mx-rect.left)*sx, cy=(my-rect.top)*sy; cx=Math.min(Math.max(cx,0),cw); cy=Math.min(Math.max(cy,0),ch);
+            arrows.push(new Arrow(fairy.x,fairy.y,cx,cy)); playShoot(); if(navigator.vibrate)navigator.vibrate(30);
+        }
+        function drawFairy(){
+            ctx.save(); ctx.shadowBlur=0; ctx.beginPath(); ctx.arc(fairy.x,fairy.y,30,0,Math.PI*2); ctx.fillStyle="rgba(255,235,220,0.4)"; ctx.fill();
+            ctx.font="46px 'Segoe UI Emoji'"; ctx.fillStyle="#ab8269"; ctx.fillText("🧚‍♀️",fairy.x-28,fairy.y+18);
+            ctx.font="32px 'Segoe UI Emoji'"; ctx.fillText("🏹",fairy.x-8,fairy.y-12);
+            ctx.font="bold 18px 'Inter'"; ctx.fillStyle="#9c725b"; ctx.fillText("Tia",fairy.x-30,fairy.y-24);
+            ctx.restore();
+        }
+        function drawGame(){
+            ctx.clearRect(0,0,cw,ch); let grad=ctx.createLinearGradient(0,0,0,ch); grad.addColorStop(0,"#faeedd"); grad.addColorStop(1,"#f4e4d8");
+            ctx.fillStyle=grad; ctx.fillRect(0,0,cw,ch); ctx.strokeStyle="#e3cfbf"; ctx.lineWidth=1.5; ctx.strokeRect(5,5,cw-10,ch-10);
+            for(let h of hearts)h.draw(ctx); for(let a of arrows)a.draw(ctx); drawFairy();
+            ctx.font="italic 12px 'Inter'"; ctx.fillStyle="#ac836b"; ctx.fillText("✨ klik dimana saja untuk memanah (cooldown 1s) ✨",cw-180,ch-12);
+        }
+        let lastSpawnTime=0;
+        function gameLoop(t){
+            requestAnimationFrame(gameLoop);
+            if(!gameActive)return;
+            for(let h of hearts)h.update(); for(let a of arrows)a.update(); collision();
+            if(t-lastSpawnTime>1000 && hearts.length<8){
+                lastSpawnTime=t; let y=Math.random()*(ch-70)+35; hearts.push(new Heart(y,getHeartSpeed()));
+            }
+            drawGame();
+        }
+        function onShoot(e){ e.preventDefault(); let cx,cy; if(e.touches){cx=e.touches[0].clientX; cy=e.touches[0].clientY;}else{cx=e.clientX; cy=e.clientY;} shootArrow(cx,cy); }
+        
+        // ==================== FINAL SEQUENCE & MODAL ====================
+        function triggerFinal(){
+            if(!gameActive)return; gameActive=false; stopBgMusic();
+            let overlay=document.createElement('div'); overlay.className='heart-rain-overlay'; document.body.appendChild(overlay);
+            for(let i=0;i<40;i++){
+                let heart=document.createElement('i'); heart.className='fas fa-heart heart-particle';
+                heart.style.left=Math.random()*100+'%'; heart.style.top=Math.random()*100+'%';
+                heart.style.fontSize=Math.random()*30+20+'px'; heart.style.animationDelay=Math.random()*0.8+'s';
+                heart.style.color=`rgba(220,120,80,${Math.random()*0.6+0.4})`; overlay.appendChild(heart);
+                setTimeout(()=>heart.remove(),1600);
+            }
+            let textDiv=document.createElement('div'); textDiv.className='floating-text-long'; textDiv.innerText='🌸 Baca Sampai Habis yaa Cantik 🌸'; document.body.appendChild(textDiv);
+            playBerhasil(); setTimeout(()=>overlay.remove(),1700);
+            setTimeout(()=>{ if(textDiv&&textDiv.remove)textDiv.remove(); showFinalModal(); },5000);
+        }
+        
+        // ==================== FUNGSI REDIRECT WHATSAPP (METODE MANUAL + COPY) ====================
+        function openWhatsApp(phone, message, redirectAfter = null) {
+            const fullMessage = `Halo Febri, ini dari game.\n\n${message}\n\n(Dikirim dari Bidadari Penembak Hati)`;
+            const confirmMsg = `⚠️ Aplikasi tidak bisa membuka WhatsApp otomatis.\n\nSilakan buka WhatsApp secara manual, lalu kirim pesan ke nomor:\n📱 ${phone}\n\nDengan isi pesan:\n"${fullMessage}"\n\nTekan OK untuk menyalin pesan ke clipboard.`;
+            if (confirm(confirmMsg)) {
+                navigator.clipboard.writeText(fullMessage).then(() => {
+                    alert("✓ Pesan berhasil disalin! Sekarang buka WhatsApp, cari kontak Febri (atau ketik nomor), paste pesan, dan kirim. Terima kasih 💕");
+                }).catch(() => {
+                    alert(`Silakan salin pesan berikut secara manual:\n\n"${fullMessage}"\n\nLalu kirim ke ${phone} di WhatsApp.`);
+                });
+            }
+            if (redirectAfter) {
+                setTimeout(() => {
+                    window.location.href = redirectAfter;
+                }, 2000);
+            }
+        }
+        
+        function showFinalModal(){
+            let finalModal=document.getElementById('finalModal'), finalMsgDiv=document.getElementById('finalMessage');
+            let mainMsg=`Dear Tia,\n\nsebenarnya Febri sudah lama suka sama tia cuma ragu aja untuk mengungkapkan nya, lewat game ini febri ingin menyampaikan sesuatu ke tia.\n\nJika febri Melepaskan tia, febri takkan bisa menggapai tia lagi.\n\nYang mau febri Katakan ini. Sangat Memalukan Sampai Rasanya ingin mati saja, tapi mungkin Tia tidak Menginginkan Ini. Tapi Febri Ingin Tetap Terlibat Dengan Tia. Bukan Sebagai Kewajiban, Tapi Keinginan.\n\nHidup febri Memang Tidak Seberapa. Febri juga tidak Punya masa depan yang cerah. Tapi jika febri dapat terlibat dalam hidup orang lain, Sudah Seadilnya jika febri memberikan segalanya. febri akan memberi tia segalanya.\n\n"Izin kan Febri Terlibat dalam hidup tia"`;
+            let noteHtml=`<div class="important-note">📌 Note: Jika tia Menekan Tombol Sebelah Kanan, akan ada Game Selanjutnya yang menanti Tiaa.. ✨</div>`;
+            finalMsgDiv.innerHTML=mainMsg+noteHtml; finalModal.classList.add('active');
+            let leftBtn=document.getElementById('finalLeftBtn'), rightBtn=document.getElementById('finalRightBtn'), phone='62895339903594';
+            
+            leftBtn.onclick=()=>{
+                openWhatsApp(phone, 'Kita berteman dulu yaa..', null);
+                finalModal.classList.remove('active'); 
+                gameActive=true; 
+                resetGame(); 
+                hearts=[]; 
+                arrows=[];
+                for(let i=0;i<4;i++) hearts.push(new Heart(Math.random()*(ch-70)+35, getHeartSpeed()));
+                playPop();
+            };
+            
+            rightBtn.onclick=()=>{
+                openWhatsApp(phone, 'Aku juga mau menanggung hak istimewa untuk mendistorsi hidupmu', 'main.html');
+                finalModal.classList.remove('active');
+            };
+        }
+        
+        function startGame(){
+            gameActive=true; initMusic();
+            canvas.addEventListener('click',onShoot); canvas.addEventListener('touchstart',onShoot,{passive:false});
+            document.getElementById('resetGameBtn').addEventListener('click',()=>{
+                if(!gameActive)return; resetGame(); hearts=[]; arrows=[];
+                for(let i=0;i<4;i++) hearts.push(new Heart(Math.random()*(ch-70)+35, getHeartSpeed()));
+                msgDiv.innerHTML="🌸 Hati baru tersebar! Arahkan panah cintamu lagi untuk Tia 🌸";
+                if(modalAchieve.classList.contains('active')) modalAchieve.classList.remove('active');
+            });
+            for(let i=0;i<3;i++) hearts.push(new Heart(Math.random()*(ch-70)+35, getHeartSpeed()));
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // ==================== BUNGA JATUH (OPTIMASI RINGAN) ====================
+        const petalCanvas=document.getElementById('petalCanvas'), pCtx=petalCanvas.getContext('2d');
+        let petals=[], pW,pH;
+        const PETAL_COUNT=25, GRAVITY=0.12;
+        class Petal{
+            constructor(x,y,s,sx,sy,rot,rotSpd,col){ this.x=x;this.y=y;this.s=s;this.sx=sx;this.sy=sy;this.rot=rot;this.rotSpd=rotSpd;this.col=col;this.op=rand(0.65,0.95); }
+            update(){ this.x+=this.sx+0.01; this.y+=this.sy; this.sy+=GRAVITY; this.rot+=this.rotSpd; if(this.y>pH+40||this.x<-70||this.x>pW+100) this.respawn(); if(this.y<-50) this.respawn(); }
+            respawn(){ this.x=rand(10,pW-10); this.y=rand(-50,-15); this.sy=rand(0.8,2.0); this.sx=rand(-0.4,0.6); this.s=rand(5,10); this.rot=rand(0,Math.PI*2); this.rotSpd=rand(-0.02,0.02); const cl=['rgba(238,190,168,0.85)','rgba(245,208,188,0.9)','rgba(251,218,202,0.88)']; this.col=cl[Math.floor(Math.random()*cl.length)]; this.op=rand(0.7,0.95); }
+            draw(ctx){ ctx.save(); ctx.globalAlpha=this.op; ctx.translate(this.x,this.y); ctx.rotate(this.rot); ctx.beginPath(); ctx.ellipse(0,0,this.s*0.7,this.s*0.45,0,0,Math.PI*2); ctx.fillStyle=this.col; ctx.fill(); ctx.restore(); }
+        }
+        function resizePetal(){ pW=innerWidth; pH=innerHeight; petalCanvas.width=pW; petalCanvas.height=pH; petals=[]; for(let i=0;i<PETAL_COUNT;i++) petals.push(new Petal(rand(10,pW-10), rand(-30,pH*0.6), rand(5,10), rand(-0.4,0.6), rand(0.8,2.2), rand(0,Math.PI*2), rand(-0.02,0.02), '')); }
+        function drawPetals(){ if(!pCtx)return; pCtx.clearRect(0,0,pW,pH); for(let p of petals){ p.update(); p.draw(pCtx); } requestAnimationFrame(drawPetals); }
+        window.addEventListener('resize',resizePetal); resizePetal(); drawPetals();
+    })();
+</script>
+</body>
+</html>

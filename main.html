@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>💖 Pukul Tikus untuk Tia 💖 | Special Winner Card</title>
+    <style>
+        /* ========== CSS SAMA PERSIS (tidak diubah) ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { min-height: 100vh; background: linear-gradient(145deg, #ffb7b2 0%, #ff9a8b 100%); display: flex; justify-content: center; align-items: center; font-family: 'Segoe UI', 'Quicksand', 'Poppins', system-ui, sans-serif; padding: 20px; cursor: crosshair; position: relative; overflow-x: hidden; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,200,180,0.95); backdrop-filter: blur(12px); z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; transition: opacity 0.5s ease; font-family: inherit; }
+        .loading-card { background: #fff0e0dd; border-radius: 70px; padding: 30px 40px; text-align: center; box-shadow: 0 20px 30px rgba(0,0,0,0.2); border: 2px solid #ffb47b; max-width: 90%; width: 350px; }
+        .loading-emoji { font-size: 4rem; animation: bounceLoading 0.8s infinite alternate; margin-bottom: 10px; }
+        @keyframes bounceLoading { 0%{transform:translateY(0px);}100%{transform:translateY(-15px);} }
+        .loading-text { font-size: 1.6rem; font-weight: bold; color: #ac4e2c; margin: 15px 0 10px; }
+        .loading-percent { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg,#ff8c5a,#ff5e7e); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .loading-bar { width: 80%; height: 12px; background: #f7d9c4; border-radius: 20px; margin: 20px auto; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+        .loading-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#ff8c5a,#ff5e7e); border-radius: 20px; transition: width 0.2s ease; }
+        .loading-sub { font-size: 0.9rem; color: #b45f2e; margin-top: 10px; }
+        .game-wrapper { background: #ffe2c9; border-radius: 90px 90px 70px 70px; padding: 20px 25px 35px; box-shadow: 0 30px 35px rgba(0,0,0,0.3), inset 0 1px 6px rgba(255,250,210,0.8); border-bottom: 8px solid #d4a373; position: relative; z-index: 2; opacity: 0; transform: scale(0.98); transition: opacity 0.5s ease, transform 0.4s ease; pointer-events: none; max-width: 550px; width: 100%; margin: 0 auto; }
+        .game-wrapper.visible { opacity: 1; transform: scale(1); pointer-events: auto; }
+        .game-wrapper::after { content: "✨ untuk Tia tercinta ✨"; position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); background: #ffb882; color: #5e2a1c; font-size: 0.8rem; font-weight: bold; padding: 4px 20px; border-radius: 40px; white-space: nowrap; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-family: monospace; letter-spacing: 1px; }
+        /* Kontrol musik baru */
+        .music-player-panel {
+            background: #fff0e0cc;
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            padding: 10px 15px;
+            margin-top: 12px;
+            border: 1px solid #ffb47b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .track-info {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #ac4e2c;
+            margin-bottom: 6px;
+        }
+        .music-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .ctrl-btn {
+            background: #eccfbc;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            color: #6d3b22;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .ctrl-btn:active { transform: scale(0.95); background: #dcb99f; }
+        .progress-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .time-text {
+            font-size: 0.6rem;
+            font-family: monospace;
+            color: #7a4c32;
+            min-width: 36px;
+        }
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: #e7cfbe;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #ff8c5a;
+            border-radius: 10px;
+        }
+        .audio-control { position: absolute; top: 20px; right: 25px; background: #fff0e0cc; backdrop-filter: blur(8px); border-radius: 50px; padding: 6px 12px; display: flex; gap: 10px; z-index: 20; border: 1px solid #ffb47b; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .audio-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2)); transition: transform 0.1s; }
+        .audio-btn:active { transform: scale(0.9); }
+        .stats { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; background: #f7d9c4; padding: 10px 25px; border-radius: 100px; margin-bottom: 30px; color: #734222; text-shadow: 1px 1px 0 #ffefcf; box-shadow: inset 0 2px 5px rgba(97,45,18,0.2), 0 8px 0 #b97f54; }
+        .score-box, .timer-box { background: #fff0e0; padding: 5px 15px; border-radius: 50px; font-weight: bold; text-align: center; flex: 1; box-shadow: inset 0 1px 3px #cb9a73, 0 4px 6px rgba(0,0,0,0.1); }
+        .score-box span:first-child, .timer-box span:first-child { font-size: 0.8rem; letter-spacing: 2px; background: #f7a46b; color: white; padding: 4px 12px; border-radius: 30px; display: inline-block; margin-bottom: 6px; text-shadow: none; font-weight: 600; }
+        .score-value, .timer-value { font-size: 2.6rem; font-weight: 800; line-height: 1; background: linear-gradient(135deg,#c95f1d,#f5a65b); background-clip: text; -webkit-background-clip: text; color: transparent; text-shadow: none; letter-spacing: 2px; }
+        .holes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 25px 35px; justify-items: center; align-items: center; margin-bottom: 30px; padding: 5px; }
+        .hole { position: relative; width: 110px; height: 110px; background: radial-gradient(circle at 30% 30%, #a56b3a, #5d3a1e); border-radius: 50%; box-shadow: inset 0 10px 8px rgba(0,0,0,0.5), 0 12px 10px rgba(0,0,0,0.2), 0 0 0 6px #f3cba5, 0 0 0 12px #d99e5e; cursor: pointer; transition: all 0.05s linear; display: flex; align-items: center; justify-content: center; }
+        .hole::before { content: "🌿"; position: absolute; top: -18px; left: -5px; font-size: 26px; opacity: 0.7; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); pointer-events: none; z-index: 2; }
+        .hole::after { content: "🍂"; position: absolute; bottom: -12px; right: -8px; font-size: 20px; opacity: 0.6; pointer-events: none; }
+        .mole { font-size: 4.5rem; transform: scale(0.8); transition: 0.02s linear; filter: drop-shadow(3px 5px 8px rgba(0,0,0,0.3)); cursor: pointer; pointer-events: auto; display: none; animation: popUp 0.08s cubic-bezier(0.34,1.2,0.64,1); position: relative; z-index: 5; }
+        .mole::before { content: "❤️"; position: absolute; font-size: 18px; top: -10px; right: -10px; opacity: 0; transition: 0.05s; }
+        .hole.active .mole::before { opacity: 1; animation: tinyHeart 0.2s ease-out; }
+        @keyframes tinyHeart { 0%{transform:scale(0); opacity:0;} 80%{transform:scale(1.2); opacity:1;} 100%{transform:scale(1); opacity:1;} }
+        .hole.active .mole { display: block; }
+        @keyframes popUp { 0%{transform:scale(0.1) translateY(25px); opacity:0;} 100%{transform:scale(1) translateY(0); opacity:1;} }
+        .hole.hit .mole { animation: whack 0.08s ease-out forwards !important; }
+        @keyframes whack { 0%{transform:scale(1); filter:brightness(1);} 100%{transform:scale(0) rotate(15deg); opacity:0;} }
+        .hole.active { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="30" viewBox="0 0 26 30"><polygon points="3,3 23,14 13,17 6,27" fill="%23ff8c5a" stroke="%235e2a1a" stroke-width="1.5"/><circle cx="8" cy="11" r="2" fill="white"/><text x="15" y="20" font-size="12" fill="%23ff3366">💕</text></svg>') 12 6, grab; }
+        .restart-btn { background: #ffb882; border: none; padding: 12px 28px; font-size: 1.3rem; font-weight: bold; font-family: inherit; color: #4c2a18; border-radius: 60px; display: block; margin: 10px auto 5px; cursor: pointer; box-shadow: 0 7px 0 #b4622a; transition: 0.07s linear; letter-spacing: 1px; width: fit-content; display: flex; align-items: center; gap: 10px; }
+        .restart-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b4622a; }
+        .game-over-msg { text-align: center; margin-top: 12px; font-weight: bold; background: #fff0e0dd; backdrop-filter: blur(6px); padding: 6px 15px; border-radius: 40px; color: #ac4e2c; font-size: 1rem; border: 1px solid #ffc49b; }
+        .floating-heart { position: absolute; pointer-events: none; font-size: 24px; animation: floatLove 0.6s ease-out forwards; z-index: 100; }
+        @keyframes floatLove { 0%{transform:translate(0,0) scale(0.5); opacity:1;} 100%{transform:translate(var(--x,-20px), var(--y,-50px)) scale(1.2); opacity:0;} }
+        .winner-card-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); z-index:2000; display:flex; justify-content:center; align-items:center; visibility:hidden; opacity:0; transition:visibility 0.2s, opacity 0.3s; }
+        .winner-card-overlay.show { visibility:visible; opacity:1; }
+        .winner-card { background: linear-gradient(145deg,#fff8f0,#fff0e0); border-radius:60px; width:90%; max-width:480px; padding:30px 25px 40px; text-align:center; box-shadow:0 30px 40px rgba(0,0,0,0.3), inset 0 1px 3px rgba(255,255,200,0.8); border:3px solid gold; position:relative; animation:popWinner 0.4s cubic-bezier(0.34,1.3,0.64,1); }
+        @keyframes popWinner { 0%{transform:scale(0.7); opacity:0;} 100%{transform:scale(1); opacity:1;} }
+        .winner-card h2 { font-size:2.2rem; background:linear-gradient(135deg,#ff6699,#ffb347); background-clip:text; -webkit-background-clip:text; color:transparent; margin-bottom:15px; }
+        .winner-card .winner-emoji { font-size:4rem; margin:10px 0; }
+        .winner-card p { font-size:1.1rem; color:#5e2a1c; margin:12px 0; line-height:1.4; }
+        .winner-card .highlight { font-weight:bold; color:#ff5e7e; background:#fff0d4; display:inline-block; padding:4px 12px; border-radius:40px; }
+        .countdown-box { background:#2c1a0e; padding:12px; border-radius:60px; margin:20px 0; color:#ffcf8a; font-weight:bold; }
+        .countdown-number { font-size:3rem; font-family:monospace; letter-spacing:5px; background:#ffd966; display:inline-block; padding:5px 20px; border-radius:50px; color:#4a2a18; }
+        .whatsapp-btn { background:#25D366; border:none; padding:12px 20px; border-radius:50px; font-size:1.2rem; font-weight:bold; color:white; display:inline-flex; align-items:center; gap:10px; cursor:pointer; margin-top:10px; transition:0.1s; box-shadow:0 4px 8px rgba(0,0,0,0.2); }
+        .whatsapp-btn:active { transform:scale(0.97); }
+        .close-card-btn { background:#ffb882; margin-top:15px; padding:8px 18px; border:none; border-radius:40px; font-size:0.9rem; font-weight:bold; color:#4c2a18; cursor:pointer; }
+        @media (max-width:550px){ .hole{width:80px;height:80px;} .mole{font-size:3rem;} .holes-grid{gap:15px;} .winner-card{padding:20px 15px;} .winner-card h2{font-size:1.6rem;} .countdown-number{font-size:2rem;} .stats{gap:10px; padding:8px 15px;} .score-value,.timer-value{font-size:2rem;} .ctrl-btn{width:36px;height:36px;font-size:1rem;} }
+        @media (max-width:420px){ .hole{width:70px;height:70px;} .mole{font-size:2.5rem;} }
+        .love-note { text-align:center; font-size:0.75rem; margin-top:15px; color:#b45f2e; background:#fff0d4; display:inline-block; width:auto; padding:4px 18px; border-radius:40px; margin-left:auto; margin-right:auto; }
+        footer { text-align:center; margin-top:8px; }
+    </style>
+</head>
+<body>
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-card">
+        <div class="loading-emoji">🐭💨✨</div>
+        <div class="loading-text">Menyiapkan kejutan untuk Tia...</div>
+        <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+        <div class="loading-percent" id="loadingPercent">0%</div>
+        <div class="loading-sub">Memuat lagu & pukulan spesial 💖</div>
+    </div>
+</div>
+
+<div id="gameWrapper" class="game-wrapper">
+    <div class="audio-control">
+        <button class="audio-btn" id="muteMusicBtn" title="Mute/Unmute Musik">🔊</button>
+        <button class="audio-btn" id="toggleSoundBtn" title="Efek suara on/off">🎧</button>
+    </div>
+    <div class="stats">
+        <div class="score-box"><span>🐹 SKOR UNTUK TIA 🐹</span><div class="score-value" id="scoreDisplay">0</div></div>
+        <div class="timer-box"><span>⏰ WAKTU ⏰</span><div class="timer-value" id="timerDisplay">32</div></div>
+    </div>
+    <div class="holes-grid" id="holesGrid"></div>
+    <button class="restart-btn" id="restartButton">🔨 PUKUL LAGI UNTUK TIA 🔨</button>
+    <div class="game-over-msg" id="gameMessage"></div>
+    <footer><div class="love-note">💖 Raih skor 40 dan dapatkan KARTU HADIAH SPESIAL! 💖</div></footer>
+</div>
+
+<div id="winnerCardOverlay" class="winner-card-overlay">
+    <div class="winner-card">
+        <div class="winner-emoji">🏆🎉🐭💕</div>
+        <h2>🎀 SELAMAT TIA! 🎀</h2>
+        <p>✨ <strong>KAMU PEMENANG!</strong> ✨</p>
+        <p>Kartu ini adalah bukti bahwa Tia sudah mencapai <span class="highlight">SKOR TERTINGGI (40)</span>.</p>
+        <p>📸 <strong>Screenshot kartu ini</strong> lalu kirim ke <strong>Febri</strong> sebagai developer.</p>
+        <p>🍕🎁 <strong>HADIAH UTAMA:</strong> Jalan-jalan & makan GRATIS bersama Febri! 🎁🍔</p>
+        <p>💬 Akan dialihkan ke WhatsApp dalam...</p>
+        <div class="countdown-box">
+            <span class="countdown-number" id="countdownTimer">20</span> detik
+        </div>
+        <button class="whatsapp-btn" id="directWaBtn">📱 Hubungi Febri Sekarang 📱</button>
+        <div><button class="close-card-btn" id="closeWinnerBtn">Tutup & Main Lagi</button></div>
+        <p style="font-size:0.7rem; margin-top:12px;">*Jangan lupa screenshot sebelum pindah!</p>
+    </div>
+</div>
+
+<script>
+    // ======================= KONFIGURASI GAME =======================
+    const GAME_DURATION = 32;
+    const MOLE_VISIBLE_TIME = 580;
+    const MOLE_SPAWN_INTERVAL = 700;
+    
+    const PLAYLIST = [
+        'https://www.image2url.com/r2/default/audio/1780854379698-a4757a57-c650-4646-ba79-892359a12835.mp3',
+        'https://www.image2url.com/r2/default/audio/1780854172140-e5aafa86-7c28-4854-8593-0771adc64709.mp3',
+        'https://www.image2url.com/r2/default/audio/1780854604465-5425df73-be2e-4bfa-b2bc-28e43c41b7de.mp3'
+    ];
+    const PLAYLIST_NAMES = ["🎵 Payung Teduh - Akad.mp3", "🎵 Anji - Bukan Lelaki Sempurna.mp3", "🎵 IRWANSYAH - Pecinta Wanita.mp3"];
+    const PUNCH_URL = 'https://www.image2url.com/r2/default/audio/1780854928662-bcc1c67f-15c3-4727-9f5a-9cfe313f8fbc.mp3';
+    const WIN_SOUND_URL = 'https://www.image2url.com/r2/default/audio/1781017701244-29eb7439-4fa1-4807-9156-53e410c7af67.mp3';
+    
+    // DOM Elemen
+    let holesGrid = document.getElementById('holesGrid');
+    let scoreSpan = document.getElementById('scoreDisplay');
+    let timerSpan = document.getElementById('timerDisplay');
+    let restartBtn = document.getElementById('restartButton');
+    let gameMsgDiv = document.getElementById('gameMessage');
+    let muteMusicBtn = document.getElementById('muteMusicBtn');
+    let toggleSoundBtn = document.getElementById('toggleSoundBtn');
+    let gameWrapper = document.getElementById('gameWrapper');
+    let loadingOverlay = document.getElementById('loadingOverlay');
+    let loadingFill = document.getElementById('loadingFill');
+    let loadingPercentSpan = document.getElementById('loadingPercent');
+    let winnerOverlay = document.getElementById('winnerCardOverlay');
+    let countdownTimerSpan = document.getElementById('countdownTimer');
+    let directWaBtn = document.getElementById('directWaBtn');
+    let closeWinnerBtn = document.getElementById('closeWinnerBtn');
+    
+    let score = 0;
+    let timeLeft = GAME_DURATION;
+    let gameActive = false;
+    let moleInterval = null;
+    let countdownInterval = null;
+    let holes = [];
+    let holeTimeouts = [];
+    let winCardShown = false;
+    let winCountdownInterval = null;
+    
+    let preloadedPunch = null;
+    let isMusicStarted = false;
+    let currentAudio = null;
+    let currentTrackIndex = 0;
+    let isMusicMuted = false;
+    let isSfxMuted = false;
+    let winSound = null;
+    let progressInterval = null;
+    
+    // Elemen kontrol musik
+    let musicPlayerDiv = null;
+    let playPauseBtn = null, prevBtn = null, nextBtn = null, back5Btn = null, fwd5Btn = null;
+    let trackNameSpan = null, progressFill = null, currentTimeSpan = null, durationSpan = null;
+    
+    // ======================= PRELOAD AUDIO =======================
+    async function preloadAllAudio() {
+        const totalItems = PLAYLIST.length + 1;
+        let loadedCount = 0;
+        function updateProgress() {
+            const percent = Math.floor((loadedCount / totalItems) * 100);
+            loadingFill.style.width = percent + '%';
+            loadingPercentSpan.innerText = percent + '%';
+            if (percent === 100) {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                    gameWrapper.classList.add('visible');
+                    gameMsgDiv.innerHTML = "✨ Semua siap! Klik tombol PUKUL LAGI untuk mulai bermain ✨";
+                    createMusicPlayer();
+                }, 500);
+            }
+        }
+        
+        const punchAudio = new Audio(PUNCH_URL);
+        punchAudio.volume = 1.0;
+        punchAudio.preload = 'auto';
+        punchAudio.addEventListener('canplaythrough', () => {
+            preloadedPunch = punchAudio;
+            loadedCount++; updateProgress();
+        });
+        punchAudio.addEventListener('error', () => {
+            preloadedPunch = punchAudio;
+            loadedCount++; updateProgress();
+        });
+        punchAudio.load();
+        
+        for (let i = 0; i < PLAYLIST.length; i++) {
+            const audio = new Audio(PLAYLIST[i]);
+            audio.volume = 0.5;
+            audio.preload = 'auto';
+            audio.addEventListener('canplaythrough', () => {
+                loadedCount++; updateProgress();
+            });
+            audio.addEventListener('error', () => {
+                loadedCount++; updateProgress();
+            });
+            audio.load();
+        }
+        
+        winSound = new Audio(WIN_SOUND_URL);
+        winSound.volume = 0.9;
+        winSound.load();
+        
+        setTimeout(() => {
+            if (loadedCount < totalItems) {
+                loadedCount = totalItems;
+                updateProgress();
+            }
+        }, 8000);
+    }
+    
+    // ======================= KONTROL MUSIK & PLAYLIST =======================
+    function createMusicPlayer() {
+        const infoCard = document.querySelector('.info-card') || document.querySelector('.stats')?.parentNode;
+        if (!infoCard) return;
+        musicPlayerDiv = document.createElement('div');
+        musicPlayerDiv.className = 'music-player-panel';
+        musicPlayerDiv.innerHTML = `
+            <div class="track-info"><span id="trackName">🎵 Belum ada lagu</span></div>
+            <div class="music-controls">
+                <button id="prevTrackBtn" class="ctrl-btn" title="Lagu sebelumnya">⏮️</button>
+                <button id="back5Btn" class="ctrl-btn" title="Mundur 5 detik">-5⏪</button>
+                <button id="playPauseMusicCtrl" class="ctrl-btn" title="Play/Pause">▶️</button>
+                <button id="forward5Btn" class="ctrl-btn" title="Maju 5 detik">+5⏩</button>
+                <button id="nextTrackBtn" class="ctrl-btn" title="Lagu berikutnya">⏭️</button>
+            </div>
+            <div class="progress-area">
+                <span class="time-text" id="currentTimeDisplay">0:00</span>
+                <div class="progress-bar"><div class="progress-fill" id="musicProgressFill"></div></div>
+                <span class="time-text" id="durationDisplay">0:00</span>
+            </div>
+        `;
+        const musicCustom = document.querySelector('.music-custom');
+        if (musicCustom) musicCustom.insertAdjacentElement('afterend', musicPlayerDiv);
+        else infoCard.appendChild(musicPlayerDiv);
+        
+        playPauseBtn = document.getElementById('playPauseMusicCtrl');
+        prevBtn = document.getElementById('prevTrackBtn');
+        nextBtn = document.getElementById('nextTrackBtn');
+        back5Btn = document.getElementById('back5Btn');
+        fwd5Btn = document.getElementById('forward5Btn');
+        trackNameSpan = document.getElementById('trackName');
+        progressFill = document.getElementById('musicProgressFill');
+        currentTimeSpan = document.getElementById('currentTimeDisplay');
+        durationSpan = document.getElementById('durationDisplay');
+        
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        prevBtn.addEventListener('click', () => changeTrack(-1));
+        nextBtn.addEventListener('click', () => changeTrack(1));
+        back5Btn.addEventListener('click', () => seekAudio(-5));
+        fwd5Btn.addEventListener('click', () => seekAudio(5));
+        
+        setInterval(updateProgressDisplay, 250);
+    }
+    
+    function updateTrackInfo() {
+        if (trackNameSpan) trackNameSpan.innerText = PLAYLIST_NAMES[currentTrackIndex % PLAYLIST_NAMES.length];
+    }
+    
+    function togglePlayPause() {
+        if (!isMusicStarted) {
+            startBackgroundMusic();
+            return;
+        }
+        if (currentAudio) {
+            if (currentAudio.paused) {
+                currentAudio.play().catch(e => console.warn);
+                if (playPauseBtn) playPauseBtn.innerHTML = '⏸️';
+            } else {
+                currentAudio.pause();
+                if (playPauseBtn) playPauseBtn.innerHTML = '▶️';
+            }
+        }
+    }
+    
+    function seekAudio(seconds) {
+        if (currentAudio && !isNaN(currentAudio.duration)) {
+            let newTime = currentAudio.currentTime + seconds;
+            if (newTime < 0) newTime = 0;
+            if (newTime > currentAudio.duration) newTime = currentAudio.duration;
+            currentAudio.currentTime = newTime;
+        }
+    }
+    
+    function changeTrack(delta) {
+        if (!isMusicStarted) {
+            startBackgroundMusic();
+            return;
+        }
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.onended = null;
+            currentAudio = null;
+        }
+        let newIndex = (currentTrackIndex + delta + PLAYLIST.length) % PLAYLIST.length;
+        playTrack(newIndex);
+    }
+    
+    function updateProgressDisplay() {
+        if (currentAudio && !isNaN(currentAudio.duration) && isFinite(currentAudio.duration)) {
+            const percent = (currentAudio.currentTime / currentAudio.duration) * 100;
+            if (progressFill) progressFill.style.width = percent + '%';
+            if (currentTimeSpan) currentTimeSpan.innerText = formatTime(currentAudio.currentTime);
+            if (durationSpan) durationSpan.innerText = formatTime(currentAudio.duration);
+            if (playPauseBtn) {
+                playPauseBtn.innerHTML = currentAudio.paused ? '▶️' : '⏸️';
+            }
+        } else {
+            if (progressFill) progressFill.style.width = '0%';
+            if (currentTimeSpan) currentTimeSpan.innerText = '0:00';
+            if (durationSpan) durationSpan.innerText = '0:00';
+        }
+    }
+    
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+    
+    function stopPlaylist() {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.onended = null;
+            currentAudio = null;
+        }
+        isMusicStarted = false;
+        if (playPauseBtn) playPauseBtn.innerHTML = '▶️';
+    }
+    
+    function playTrack(index) {
+        if (!isMusicStarted) return;
+        if (index >= PLAYLIST.length) index = 0;
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.onended = null;
+            currentAudio = null;
+        }
+        const audio = new Audio(PLAYLIST[index]);
+        audio.volume = 0.4;
+        audio.muted = isMusicMuted;
+        currentAudio = audio;
+        currentTrackIndex = index;
+        updateTrackInfo();
+        
+        audio.play().catch(e => console.log("Play gagal", e));
+        
+        audio.onended = () => {
+            if (!isMusicStarted) return;
+            const nextIndex = (currentTrackIndex + 1) % PLAYLIST.length;
+            playTrack(nextIndex);
+        };
+        audio.onerror = () => {
+            if (!isMusicStarted) return;
+            const nextIndex = (currentTrackIndex + 1) % PLAYLIST.length;
+            setTimeout(() => playTrack(nextIndex), 500);
+        };
+        if (playPauseBtn) playPauseBtn.innerHTML = '⏸️';
+    }
+    
+    function startBackgroundMusic() {
+        if (isMusicStarted) return;
+        isMusicStarted = true;
+        playTrack(0);
+    }
+    
+    function setMusicMuted(muted) {
+        isMusicMuted = muted;
+        if (currentAudio) currentAudio.muted = isMusicMuted;
+        muteMusicBtn.innerHTML = isMusicMuted ? "🔇" : "🔊";
+    }
+    
+    function playPunchSound() {
+        if (isSfxMuted) return;
+        if (!preloadedPunch) return;
+        try {
+            preloadedPunch.currentTime = 0;
+            preloadedPunch.play().catch(e => {});
+        } catch(e) {}
+    }
+    
+    // ======================= FUNGSI REDIRECT WHATSAPP =======================
+    function redirectToWhatsApp() {
+        const phone = "62895339903594";
+        const message = "Halo Febri! Aku Tia. Aku berhasil mendapat skor 40 di game Pukul Tikus! Ayo kita jalan dan makan gratis sesuai hadiah 🎁✨ (screenshot kartu terlampir)";
+        const fullMessage = `Halo Febri, ini dari game Pukul Tikus.\n\n${message}\n\n(Dikirim dari aplikasi)`;
+        const confirmMsg = `⚠️ Aplikasi tidak bisa membuka WhatsApp otomatis.\n\nSilakan buka WhatsApp secara manual, lalu kirim pesan ke nomor:\n📱 ${phone}\n\nDengan isi pesan:\n"${fullMessage}"\n\nTekan OK untuk menyalin pesan ke clipboard.`;
+        if (confirm(confirmMsg)) {
+            navigator.clipboard.writeText(fullMessage).then(() => {
+                alert("✓ Pesan berhasil disalin! Sekarang buka WhatsApp, cari kontak Febri (atau ketik nomor), paste pesan, dan kirim. Terima kasih 💕");
+            }).catch(() => {
+                alert(`Silakan salin pesan berikut secara manual:\n\n"${fullMessage}"\n\nLalu kirim ke ${phone} di WhatsApp.`);
+            });
+        }
+    }
+    
+    // ======================= WINNER CARD =======================
+    function stopAllGameAndMusic() {
+        stopPlaylist();
+        if (moleInterval) clearInterval(moleInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
+        gameActive = false;
+    }
+    
+    function playWinSound() {
+        if (winSound) {
+            winSound.currentTime = 0;
+            winSound.play().catch(e => {});
+        }
+    }
+    
+    function startWinnerCountdown() {
+        let seconds = 20;
+        countdownTimerSpan.innerText = seconds;
+        if (winCountdownInterval) clearInterval(winCountdownInterval);
+        winCountdownInterval = setInterval(() => {
+            seconds--;
+            countdownTimerSpan.innerText = seconds;
+            if (seconds <= 0) {
+                clearInterval(winCountdownInterval);
+                redirectToWhatsApp();
+            }
+        }, 1000);
+    }
+    
+    function showWinnerCard() {
+        if (winCardShown) return;
+        winCardShown = true;
+        stopAllGameAndMusic();
+        playWinSound();
+        winnerOverlay.classList.add('show');
+        startWinnerCountdown();
+    }
+    
+    function hideWinnerCardAndRestart() {
+        if (winCountdownInterval) clearInterval(winCountdownInterval);
+        winnerOverlay.classList.remove('show');
+        winCardShown = false;
+        restartGame(true);
+    }
+    
+    // ======================= FUNGSI GAME (DIPERCEPAT RESPONS PUKUL) =======================
+    function updateScoreUI() {
+        scoreSpan.innerText = score;
+        if (score === 40 && gameActive && !winCardShown) {
+            showWinnerCard();
+        }
+    }
+    function updateTimerUI() { 
+        timerSpan.innerText = timeLeft; 
+        if (timeLeft <= 0) timerSpan.innerText = "0"; 
+    }
+    function createHeartEffect(x, y) {
+        const heart = document.createElement('div');
+        heart.className = 'floating-heart';
+        heart.innerHTML = '❤️';
+        heart.style.left = (x - 15) + 'px';
+        heart.style.top = (y - 20) + 'px';
+        const randomX = (Math.random() - 0.5) * 50;
+        const randomY = -50 - Math.random() * 30;
+        heart.style.setProperty('--x', randomX + 'px');
+        heart.style.setProperty('--y', randomY + 'px');
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 600);
+    }
+    function showFloatingMessage(msg, color) {
+        const msgDiv = document.createElement('div');
+        msgDiv.innerText = msg;
+        msgDiv.style.position = 'fixed';
+        msgDiv.style.bottom = '30%';
+        msgDiv.style.left = '50%';
+        msgDiv.style.transform = 'translateX(-50%)';
+        msgDiv.style.background = '#fff0e0cc';
+        msgDiv.style.backdropFilter = 'blur(8px)';
+        msgDiv.style.padding = '6px 20px';
+        msgDiv.style.borderRadius = '40px';
+        msgDiv.style.fontWeight = 'bold';
+        msgDiv.style.color = color;
+        msgDiv.style.zIndex = '999';
+        document.body.appendChild(msgDiv);
+        setTimeout(() => msgDiv.remove(), 800);
+    }
+    function hideMole(index) {
+        if (!holes[index]) return;
+        const hole = holes[index];
+        if (hole.classList.contains('active')) hole.classList.remove('active');
+        if (holeTimeouts[index] !== null) { 
+            clearTimeout(holeTimeouts[index]); 
+            holeTimeouts[index] = null; 
+        }
+        if (hole.classList.contains('hit')) hole.classList.remove('hit');
+    }
+    function showMoleAtIndex(index) {
+        if (!gameActive) return false;
+        const hole = holes[index];
+        if (!hole || hole.classList.contains('active')) return false;
+        hole.classList.add('active');
+        hole.classList.remove('hit');
+        const timeoutId = setTimeout(() => {
+            if (gameActive && holes[index] && holes[index].classList.contains('active')) hideMole(index);
+            else if (!gameActive && holes[index]) holes[index].classList.remove('active');
+            holeTimeouts[index] = null;
+        }, MOLE_VISIBLE_TIME);
+        if (holeTimeouts[index] !== null) clearTimeout(holeTimeouts[index]);
+        holeTimeouts[index] = timeoutId;
+        return true;
+    }
+    function spawnRandomMole() {
+        if (!gameActive) return;
+        const inactiveHoles = [];
+        for (let i = 0; i < holes.length; i++) if (!holes[i].classList.contains('active')) inactiveHoles.push(i);
+        if (inactiveHoles.length === 0) return;
+        const randomIndex = inactiveHoles[Math.floor(Math.random() * inactiveHoles.length)];
+        showMoleAtIndex(randomIndex);
+    }
+    function whackEffect(holeElement, clientX, clientY) {
+        holeElement.classList.add('hit');
+        setTimeout(() => { if (holeElement) holeElement.classList.remove('hit'); }, 80);
+        if (clientX && clientY) createHeartEffect(clientX, clientY);
+        else { const rect = holeElement.getBoundingClientRect(); createHeartEffect(rect.left + rect.width/2, rect.top + rect.height/2); }
+    }
+    function handleWhack(hole, index, event) {
+        if (!gameActive) return false;
+        if (!hole.classList.contains('active')) return false;
+        
+        // Langsung pukul tanpa delay
+        playPunchSound();
+        score++;
+        updateScoreUI();
+        const clickX = event ? event.clientX : null;
+        const clickY = event ? event.clientY : null;
+        whackEffect(hole, clickX, clickY);
+        hideMole(index);
+        return true;
+    }
+    function stopGame(keepMessage = false) {
+        gameActive = false;
+        if (moleInterval) { clearInterval(moleInterval); moleInterval = null; }
+        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+        for (let i = 0; i < holes.length; i++) {
+            if (holes[i]) holes[i].classList.remove('active', 'hit');
+            if (holeTimeouts[i] !== null) { clearTimeout(holeTimeouts[i]); holeTimeouts[i] = null; }
+        }
+        if (!keepMessage) {
+            if (timeLeft <= 0) gameMsgDiv.innerHTML = `💖 GAME OVER! Skor akhir untuk Tia: ${score} 💖\nKamu hebat! Main lagi yaa sayang 💕`;
+            else gameMsgDiv.innerHTML = "⏸️ Permainan dihentikan sementara.";
+        }
+    }
+    function startGame() {
+        if (moleInterval || countdownInterval) stopGame(true);
+        score = 0;
+        timeLeft = GAME_DURATION;
+        updateScoreUI();
+        updateTimerUI();
+        for (let i = 0; i < holes.length; i++) {
+            if (holes[i]) holes[i].classList.remove('active', 'hit');
+            if (holeTimeouts[i]) { clearTimeout(holeTimeouts[i]); holeTimeouts[i] = null; }
+        }
+        gameMsgDiv.innerHTML = "⚡ Ayo Tia! Pukul tikus-tikus nakal itu! ⚡ 💗";
+        gameActive = true;
+        moleInterval = setInterval(() => spawnRandomMole(), MOLE_SPAWN_INTERVAL);
+        countdownInterval = setInterval(() => {
+            if (!gameActive) return;
+            if (timeLeft <= 1) {
+                timeLeft = 0;
+                updateTimerUI();
+                if (gameActive) { gameActive = false; stopGame(false); gameMsgDiv.innerHTML = `💝 WAKTU HABIS! Skor Tia: ${score} 💝\nTekan tombol untuk main lagi, sayang! 💕`; }
+            } else { timeLeft--; updateTimerUI(); }
+        }, 1000);
+    }
+    function createHoles() {
+        holesGrid.innerHTML = '';
+        holes = []; 
+        holeTimeouts = [];
+        for (let i = 0; i < 9; i++) {
+            const holeDiv = document.createElement('div'); 
+            holeDiv.className = 'hole';
+            const moleSpan = document.createElement('div'); 
+            moleSpan.className = 'mole'; 
+            moleSpan.innerHTML = '🐭💕';
+            holeDiv.appendChild(moleSpan);
+            holesGrid.appendChild(holeDiv);
+            holes.push(holeDiv);
+            holeTimeouts.push(null);
+        }
+        holes.forEach((hole, idx) => {
+            hole.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!gameActive) return;
+                if (hole.classList.contains('active')) handleWhack(hole, idx, e);
+            });
+        });
+    }
+    
+    function restartGame(resetMusic = false) {
+        if (winCountdownInterval) clearInterval(winCountdownInterval);
+        if (winnerOverlay.classList.contains('show')) winnerOverlay.classList.remove('show');
+        winCardShown = false;
+        if (moleInterval || countdownInterval) stopGame(true);
+        for (let i = 0; i < holes.length; i++) {
+            if (holes[i]) holes[i].classList.remove('active', 'hit');
+            if (holeTimeouts[i]) { clearTimeout(holeTimeouts[i]); holeTimeouts[i] = null; }
+        }
+        if (resetMusic) {
+            stopPlaylist();
+            isMusicStarted = false;
+            startBackgroundMusic();
+        } else {
+            if (!isMusicStarted) startBackgroundMusic();
+        }
+        score = 0; 
+        timeLeft = GAME_DURATION;
+        updateScoreUI(); 
+        updateTimerUI();
+        gameMsgDiv.innerHTML = "💖 Semangat Tia! Pukul tikus nya! 💖";
+        startGame();
+    }
+    
+    // ======================= INISIALISASI =======================
+    async function initAfterPreload() {
+        createHoles();
+        muteMusicBtn.addEventListener('click', () => setMusicMuted(!isMusicMuted));
+        toggleSoundBtn.addEventListener('click', () => {
+            isSfxMuted = !isSfxMuted;
+            toggleSoundBtn.innerHTML = isSfxMuted ? "🔇" : "🎧";
+        });
+        restartBtn.addEventListener('click', () => restartGame(false));
+        directWaBtn.addEventListener('click', () => redirectToWhatsApp());
+        closeWinnerBtn.addEventListener('click', () => hideWinnerCardAndRestart());
+        gameMsgDiv.innerHTML = "✨ Klik tombol PUKUL LAGI UNTUK TIA untuk mulai bermain ✨";
+    }
+    
+    window.addEventListener('DOMContentLoaded', async () => {
+        await preloadAllAudio();
+        await initAfterPreload();
+    });
+</script>
+</body>
+</html>
